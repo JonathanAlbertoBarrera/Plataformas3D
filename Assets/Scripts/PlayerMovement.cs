@@ -53,4 +53,9 @@ public class PlayerMovement : MonoBehaviour
 
         controller.Move(desplazamiento * Time.deltaTime);
     }
+
+    public void ReiniciarEstado()
+    {
+        velocidadVertical = 0f;
+    }
 }
