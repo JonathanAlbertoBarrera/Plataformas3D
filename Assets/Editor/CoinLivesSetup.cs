@@ -126,7 +126,7 @@ public static class CoinLivesSetup
         GameObject prefabMoneda = ObtenerOCrearMoneda(materialMoneda);
         GameObject prefabObstaculo = ObtenerOCrearObstaculo(materialPeligro);
 
-        ColocarMonedas(prefabMoneda, escena);
+        ColocarMonedas(prefabMoneda, escena, jugador.transform);
         ColocarObstaculos(prefabObstaculo, escena);
 
         EditorSceneManager.MarkSceneDirty(escena);
@@ -185,6 +185,7 @@ public static class CoinLivesSetup
         SphereCollider trigger = go.AddComponent<SphereCollider>();
         trigger.isTrigger = true;
         trigger.radius = 1.5f;
+        AgregarCuerpoCinematico(go);
 
         go.transform.localScale = new Vector3(0.35f, 0.05f, 0.35f);
         go.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
@@ -216,6 +217,7 @@ public static class CoinLivesSetup
         SphereCollider collider = go.GetComponent<SphereCollider>();
         if (collider != null)
             collider.isTrigger = true;
+        AgregarCuerpoCinematico(go);
 
         Renderer renderer = go.GetComponent<Renderer>();
         if (renderer != null)
@@ -230,7 +232,14 @@ public static class CoinLivesSetup
         return prefab;
     }
 
-    private static void ColocarMonedas(GameObject prefab, Scene escena)
+    private static void AgregarCuerpoCinematico(GameObject go)
+    {
+        Rigidbody cuerpo = go.AddComponent<Rigidbody>();
+        cuerpo.useGravity = false;
+        cuerpo.isKinematic = true;
+    }
+
+    private static void ColocarMonedas(GameObject prefab, Scene escena, Transform jugador)
     {
         if (GameObject.Find("Monedas") != null)
             return;
@@ -261,6 +270,12 @@ public static class CoinLivesSetup
                     bounds.center.x + (t - 0.5f) * ancho,
                     bounds.max.y + 0.9f,
                     bounds.center.z);
+
+                if (nombre == "Suelo" && i == 1)
+                {
+                    posicion.x = Mathf.Clamp(jugador.position.x, bounds.min.x, bounds.max.x);
+                    posicion.z = Mathf.Clamp(jugador.position.z + 3f, bounds.min.z, bounds.max.z);
+                }
 
                 GameObject moneda = (GameObject)PrefabUtility.InstantiatePrefab(prefab, escena);
                 moneda.transform.position = posicion;
